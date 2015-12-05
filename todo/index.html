@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular-sanitize.js"></script>
+	<script src="js.js"></script>
+	<style type="text/css">
+		body{padding: 20px 0;}
+
+		@media
+		only screen and (-webkit-min-device-pixel-ratio: 1.25),
+		only screen and ( min-device-pixel-ratio: 1.25),
+		only screen and ( min-resolution: 200dpi),
+		only screen and ( min-resolution: 1.25dppx)
+		{
+			-webkit-font-smoothing: subpixel-antialiased;
+		}
+
+		.textDe{color:#777;}
+		.bildirim{position: fixed; right: 15px; bottom: 15px;}
+
+
+		table tr>th:first-child,
+		table tr>td:first-child{width: 22px;}
+		table thead{background-color: #f5f5f5;}
+	</style>
+</head>
+<body ng-controller="todoCtrl">
+	<div class="container">
+	<div class="row">
+		<h2 style="margin: 20px 20px; float: right;">Yapılacaklar Listesi</h2>
+	</div>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="well">
+					<h2>Kategoriler</h2>
+					<ul class="nav nav-stacked">
+						<li ng-repeat="kategori in todoData">
+							<a ng-click="postSelectedKategori(kategori)" href="#">{{kategori.kategoriName}}</a>
+						</li>
+						<li style="padding:10px 15px">
+							<form ng-submit="addKategori()" class="form-horizontal">
+								<div class="form-group">
+									<input type="text" ng-model="modelKategori" placeholder="Kategori adı yazınız..." class="form-control input-sm" required>
+								</div>
+								<div class="form-group">
+									<input type="submit" value="Gönder" class="btn btn-default btn-sm">
+								</div>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-9" ng-show="selectedKategori">
+				<form ng-submit="addTodo(selectedKategori)" class="form-inline">
+					<div class="form-group">
+						<input type="text" ng-model="modelTodo" placeholder="Yapılacak içeriği yazınız..." class="form-control input-sm" required><br />
+					</div>
+					<input type="submit" value="Gönder" class="btn btn-default btn-sm">
+				</form>
+				<br/>
+				<table class="table table-hover" ng-if="selectedKategori.todos.length">
+					<thead ng-show="(filtered = (selectedKategori.todos | filter:{'isDone':'false'})).length > 0">
+						<tr>
+							<th>#</th>
+							<th>Yapılacaklar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="todo in selectedKategori.todos | filter:{'isDone':'false'}">
+							<td>
+								<input type="checkbox" ng-model="todo.isDone" ng-change="checkboxEditBilidirim('true')">
+							</td>
+							<td>
+								<span ng-class="{textDe: todo.isDone}">
+									{{todo.text}}
+								</span>
+							</td>
+						</tr>
+					</tbody>
+					<thead ng-show="(filtered = (selectedKategori.todos | filter:{'isDone':'true'})).length > 0">
+						<tr>
+							<th>#</th>
+							<th>Tamamlananlar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="todo in selectedKategori.todos | filter:{'isDone':'true'}">
+							<td>
+								<input type="checkbox" ng-model="todo.isDone" ng-change="checkboxEditBilidirim('false')">
+							</td>
+							<td>
+								<span ng-class="{textDe: todo.isDone}">
+									{{todo.text}}
+								</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="table" ng-if="!selectedKategori.todos.length">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Yapılacak iş yok</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="alert alert-success bildirim" role="alert" ng-if="bildirim" ng-bind-html="bildirim">
+				<div ng-init="bildirimTimeout()"></div>
+			</div>
+		</div><!-- /row -->
+	</div><!-- /container -->
+</body>
+</html>
